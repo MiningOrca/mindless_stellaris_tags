@@ -47,7 +47,7 @@ def analyze_modifier(modifier_block):
             logging.warn(f"Strange value found {value}")
             continue
 
-        if 'jobs_bonus' in key or 'cat_bonus' in key or 'planet_jobs':
+        if 'jobs_bonus' in key or 'cat_bonus' in key or 'planet_jobs' in key:
             if value > 0:
                 has_positive_job_bonus = True
         if 'pop_environment_tolerance' in key:
