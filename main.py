@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 
@@ -88,7 +89,7 @@ def parse_traits(file_path, output_path):
     for trait_name, trait_text in trait_blocks:
         tags = []
 
-        logging.debug(f"working on traint {trait_name}")
+        logging.info(f"working on traint {trait_name}")
 
         cost_match = re.search(r'cost\s*=\s*([-+]?\d+)', trait_text)
         if not cost_match:
@@ -100,15 +101,16 @@ def parse_traits(file_path, output_path):
             tags.append("negative")
         else:
             tags.append("positive")
+        isCyborg = re.search(r'category\s*=\s*\{(.*?)\}', trait_text)
+        if isCyborg:
+            tags.append("cybernetic")
 
         # archetypes
         archetypes_match = re.search(r'allowed_archetypes\s*=\s*\{(.*?)\}', trait_text, re.DOTALL)
         if archetypes_match:
             archetypes = archetypes_match.group(1).split()
-            if "MACHINE" in archetypes:
-                logging.info(f"{trait_name} — skipped: 'MACHINE' in archetypes")
-                skipped_count += 1
-                continue
+            if "MACHINE" in archetypes or "ROBOT" in archetypes:
+                tags.append("machine")
             if "BIOLOGICAL" in archetypes or "LITHOID" in archetypes:
                 tags.append("organic")
         else:
@@ -143,5 +145,8 @@ def parse_traits(file_path, output_path):
 
 if __name__ == '__main__':
     path = ""
-    trait_file = ""
-    parse_traits(path + trait_file, trait_file)
+    txt_files = [f for f in os.listdir(path) if f.endswith(".txt")]
+    for trait_file in txt_files:
+        full_path = os.path.join(path, trait_file)
+        logging.info(f"Work on {trait_file}")
+        parse_traits(full_path, trait_file)
