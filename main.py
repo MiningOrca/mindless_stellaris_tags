@@ -111,11 +111,17 @@ def parse_traits(file_path, output_path):
             archetypes = archetypes_match.group(1).split()
             if "MACHINE" in archetypes or "ROBOT" in archetypes:
                 tags.append("machine")
-            if "BIOLOGICAL" in archetypes or "LITHOID" in archetypes:
+            if "BIOLOGICAL" in archetypes:
                 tags.append("organic")
+            if "LITHOID" in archetypes and "BIOLOGICAL" not in archetypes:
+                tags.append("organic")
+                tags.append("lithoid")
+            if "PRESAPIENT" in archetypes:
+                tags.append("presapient")
         else:
             logging.warn(f"{trait_name} — skipped: no 'allowed_archetypes'")
             skipped_count += 1
+            processed_traits.append(trait_text)
             continue
 
         modifier_match = re.search(r'modifier\s*=\s*\{(.*?)\}', trait_text, re.DOTALL)
