@@ -7,9 +7,8 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 def extract_trait_blocks(content):
     traits = []
-    pattern = re.compile(r'(trait_[\w\d_]+)\s*=')
+    pattern = re.compile(r'([^\s=]+trait_[\w\d_]+)\s*=')
     pos = 0
-
     while match := pattern.search(content, pos):
         trait_name = match.group(1)
         brace_start = content.find('{', match.end())
