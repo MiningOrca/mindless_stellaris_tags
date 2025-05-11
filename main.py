@@ -101,9 +101,10 @@ def parse_traits(file_path, output_path):
             tags.append("negative")
         else:
             tags.append("positive")
-        isCyborg = re.search(r'category\s*=\s*\{(.*?)\}', trait_text)
-        if isCyborg:
+        category = extract_value(r'category\s*=\s*(\w+)', trait_text)
+        if 'cyborg' in category:
             tags.append("cybernetic")
+        isAdvanced = extract_value(r'advanced_trait\s*=\s*(\w+)', trait_text)
 
         # archetypes
         archetypes_match = re.search(r'allowed_archetypes\s*=\s*\{(.*?)\}', trait_text, re.DOTALL)
@@ -113,9 +114,14 @@ def parse_traits(file_path, output_path):
                 tags.append("machine")
             if "BIOLOGICAL" in archetypes:
                 tags.append("organic")
+                if isAdvanced is 'yes':
+                    tags.append("genetic_ascension")
             if "LITHOID" in archetypes and "BIOLOGICAL" not in archetypes:
                 tags.append("organic")
                 tags.append("lithoid")
+                tags.append("species")
+                if isAdvanced:
+                    tags.append("genetic_ascension")
             if "PRESAPIENT" in archetypes:
                 tags.append("presapient")
         else:
@@ -147,6 +153,13 @@ def parse_traits(file_path, output_path):
         output_file.write("\n\n".join(processed_traits))
 
     logging.info(f"\nDone.\nAdded: {added_count}\nSkipped: {skipped_count}")
+
+
+def extract_value(pattern, text):
+    match = re.search(pattern, text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return ''
 
 
 if __name__ == '__main__':
